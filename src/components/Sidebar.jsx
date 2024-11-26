@@ -36,7 +36,7 @@ const Sidebar = () => {
         {
             title: "Impact Ranking",
             icon: faRankingStar,
-            url: `/${prefix}/impact-ranking`,
+            url: `/${prefix}/impact-attaintment`,
         },
         {
             title: "Record Tracks",
