@@ -15,7 +15,7 @@ const FileChart = () => {
         const fetchData = async () => {
             try {
                 const response = await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/get-records-count-by-status"
+                    "http://localhost:9000/api/get-records-count-by-status"
                 );
                 const result = await response.json(); // Correctly parse the JSON response
                 console.log(result, "asdasd");

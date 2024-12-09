@@ -87,7 +87,7 @@ const BatStateUSDGScoreChart = () => {
         const getCampuses = async () => {
             try {
                 const response = await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/get/campuses"
+                    "http://localhost:9000/api/get/campuses"
                 );
                 const jsonData = await response.json();
                 console.log(jsonData.length);

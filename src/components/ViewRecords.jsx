@@ -40,7 +40,7 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
         const fetchCampusData = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/sd-office/${selectedSD}`
+                    `http://localhost:9000/api/get/sd-office/${selectedSD}`
                 );
 
                 if (response.ok) {
@@ -82,7 +82,7 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
 
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
+                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (response.ok) {
                     const instrumentData = await response.json();
@@ -100,7 +100,7 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
                 const updatedInstruments = await Promise.all(
                     instrumentData.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `https://ai-backend-drcx.onrender.com/api/get/sections/${instrument.instrument_id}`
+                            `http://localhost:9000/api/get/sections/${instrument.instrument_id}`
                         );
                         if (sectionsResponse.ok) {
                             const sections = await sectionsResponse.json();
@@ -128,10 +128,10 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
                     sections.map(async (section) => {
                         try {
                             const questionsResponse = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
+                                `http://localhost:9000/api/get/questions/${section.section_id}`
                             );
                             const fetchFormulas = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
+                                `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
                             );
                             const formula = await fetchFormulas.json();
 
@@ -323,7 +323,7 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
         try {
             // Submit the record to the server
             const recordResponse = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/add/records",
+                "http://localhost:9000/api/add/records",
                 {
                     method: "POST",
                     headers: {
@@ -346,8 +346,7 @@ const ViewRecords = ({ selectedSdg, selectedYear, selectedSD }) => {
 
             // Prepare a batch of answers for submission
             const sendAnswers = async () => {
-                const url =
-                    "https://ai-backend-drcx.onrender.com/api/add/answers";
+                const url = "http://localhost:9000/api/add/answers";
 
                 for (const answer of answers) {
                     // Ensure each answer has a value and corresponding IDs

@@ -155,7 +155,7 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
     useEffect(() => {
         const fetchCampuses = async () => {
             const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/get/campuses"
+                "http://localhost:9000/api/get/campuses"
             );
             const data = await response.json();
             setCampuses(data);
@@ -163,13 +163,13 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
         const fetchRecords = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-sdg_id/${selectedSdg}/${selectedYear}`
+                    `http://localhost:9000/api/get/records-values-by-sdg_id/${selectedSdg}/${selectedYear}`
                 );
                 const data = await response.json();
                 console.log(data, "ASdasd");
 
                 const section_response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/sections/${selectedSdg}`
+                    `http://localhost:9000/api/get/sections/${selectedSdg}`
                 );
 
                 const sectionss = await section_response.json();
@@ -187,7 +187,7 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
                     let temp_formula = [];
                     for (const section_id of uniqueSectionIds) {
                         const response = await fetch(
-                            `https://ai-backend-drcx.onrender.com/api/get/formula/${section_id}`
+                            `http://localhost:9000/api/get/formula/${section_id}`
                         );
                         const formula = await response.json();
                         temp_formula.push(formula[0]);

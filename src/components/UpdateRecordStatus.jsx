@@ -55,7 +55,7 @@ const UpdateRecordStatus = ({
         const fetchExistingAnswers = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/answers/${recordId}`
+                    `http://localhost:9000/api/get/answers/${recordId}`
                 );
                 if (!response.ok) {
                     throw new Error("Failed to fetch answers");
@@ -77,7 +77,7 @@ const UpdateRecordStatus = ({
         const fetchCampusData = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/sd-office/${selectedSD}`
+                    `http://localhost:9000/api/get/sd-office/${selectedSD}`
                 );
 
                 if (response.ok) {
@@ -119,7 +119,7 @@ const UpdateRecordStatus = ({
 
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
+                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (response.ok) {
                     const instrumentData = await response.json();
@@ -137,7 +137,7 @@ const UpdateRecordStatus = ({
                 const updatedInstruments = await Promise.all(
                     instrumentData.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `https://ai-backend-drcx.onrender.com/api/get/sectionsbyinstrument/${instrument.instrument_id}`
+                            `http://localhost:9000/api/get/sectionsbyinstrument/${instrument.instrument_id}`
                         );
                         if (sectionsResponse.ok) {
                             const sections = await sectionsResponse.json();
@@ -166,15 +166,15 @@ const UpdateRecordStatus = ({
                     sections.map(async (section) => {
                         try {
                             const questionsResponse = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
+                                `http://localhost:9000/api/get/questions/${section.section_id}`
                             );
                             const fetchFormulas = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
+                                `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
                             );
 
                             const formula = await fetchFormulas.json();
                             const fetchEvidenceResponse = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/evidence/`,
+                                `http://localhost:9000/api/get/evidence/`,
                                 {
                                     method: "POST",
                                     headers: {
@@ -424,7 +424,7 @@ const UpdateRecordStatus = ({
             };
 
             const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/update/status",
+                "http://localhost:9000/api/update/status",
                 {
                     method: "PATCH",
                     headers: {
@@ -582,7 +582,7 @@ const UpdateRecordStatus = ({
 
                 // Create a notification
                 await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/csd/create-notification",
+                    "http://localhost:9000/api/csd/create-notification",
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -815,8 +815,11 @@ const UpdateRecordStatus = ({
                                                                         (
                                                                             evidence
                                                                         ) => (
-                                                                            <a href={evidence.name}>
-                                                                            </a>
+                                                                            <a
+                                                                                href={
+                                                                                    evidence.name
+                                                                                }
+                                                                            ></a>
                                                                         )
                                                                     )}
                                                             </td>

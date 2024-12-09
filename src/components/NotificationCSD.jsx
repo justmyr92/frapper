@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 // Function to fetch notifications from the backend
 const fetchNotifications = async (userId) => {
     const response = await fetch(
-        `https://ai-backend-drcx.onrender.com/api/csd/get-notifications?userId=${userId}`
+        `http://localhost:9000/api/csd/get-notifications?userId=${userId}`
     );
     const data = await response.json();
     return data.notifications || [];

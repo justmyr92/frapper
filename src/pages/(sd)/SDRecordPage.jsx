@@ -106,7 +106,7 @@ const SDRecordPage = () => {
             if (selectedYear && selectedSdg) {
                 try {
                     const response = await fetch(
-                        `https://ai-backend-drcx.onrender.com/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${localStorage.getItem(
+                        `http://localhost:9000/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${localStorage.getItem(
                             "user_id"
                         )}`, // Make sure there are no extra spaces here
                         {

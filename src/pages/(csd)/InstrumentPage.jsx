@@ -188,7 +188,7 @@ const InstrumentsPage = () => {
             });
 
             const response = await fetch(
-                `https://ai-backend-drcx.onrender.com/api/update/instrument-status/${instrument_id}`,
+                `http://localhost:9000/api/update/instrument-status/${instrument_id}`,
                 {
                     method: "PATCH",
                     headers: {

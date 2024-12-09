@@ -155,11 +155,12 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
 
     useEffect(() => {
         setScores([]);
+
         const fetchRecordsAndFormulas = async () => {
             try {
                 // Fetch the records for the selected campus
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
+                    `http://localhost:9000/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
                 );
                 const recordsData = await response.json();
 
@@ -179,7 +180,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
                 const formulas = {};
                 for (const sectionId of uniqueSectionIds) {
                     const formulaResponse = await fetch(
-                        `https://ai-backend-drcx.onrender.com/api/get/formula/${sectionId}`
+                        `http://localhost:9000/api/get/formula/${sectionId}`
                     );
                     const formulaData = await formulaResponse.json();
                     if (formulaData.length > 0) {
@@ -241,7 +242,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
         const fetchCampuses = async () => {
             try {
                 const response = await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/get/campuses"
+                    "http://localhost:9000/api/get/campuses"
                 );
                 const data = await response.json();
                 setCampuses(data);

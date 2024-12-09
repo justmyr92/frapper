@@ -149,7 +149,7 @@ const Recommender = ({ selectedYear }) => {
     //     const fetchInstruments = async () => {
     //         const response = await fetch(
     //             ///get/instrumentsbysdg/:sdg_id
-    //             `https://ai-backend-drcx.onrender.com/api/instrumentsbysdg/${selectedSdG}`
+    //             `http://localhost:9000/api/instrumentsbysdg/${selectedSdG}`
     //         );
     //         const data = await response.json();
     //         setInstruments(data);
@@ -253,7 +253,7 @@ const Recommender = ({ selectedYear }) => {
         const fetchRecordsAndFormulas = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
+                    `http://localhost:9000/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
                 );
                 const recordsData = await response.json();
 
@@ -278,7 +278,7 @@ const Recommender = ({ selectedYear }) => {
                 const formulas = {};
                 for (const sectionId of uniqueSectionIds) {
                     const formulaResponse = await fetch(
-                        `https://ai-backend-drcx.onrender.com/api/get/formula/${sectionId}`
+                        `http://localhost:9000/api/get/formula/${sectionId}`
                     );
                     const formulaData = await formulaResponse.json();
                     if (formulaData.length > 0) {
@@ -342,11 +342,10 @@ const Recommender = ({ selectedYear }) => {
             try {
                 let url;
                 localStorage.getItem("role").toString() === "1"
-                    ? (url = `https://ai-backend-drcx.onrender.com/api/get/campus-by-user-id/${localStorage.getItem(
+                    ? (url = `http://localhost:9000/api/get/campus-by-user-id/${localStorage.getItem(
                           "user_id"
                       )}`)
-                    : (url =
-                          "https://ai-backend-drcx.onrender.com/api/get/campuses");
+                    : (url = "http://localhost:9000/api/get/campuses");
 
                 const response = await fetch(url);
                 const data = await response.json();

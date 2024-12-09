@@ -111,7 +111,7 @@ const CSDRecordPage = () => {
         const fetchSdOffices = async () => {
             try {
                 const response = await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/get/sd-office"
+                    "http://localhost:9000/api/get/sd-office"
                 );
                 if (response.ok) {
                     const data = await response.json();
@@ -133,7 +133,7 @@ const CSDRecordPage = () => {
                 // Include SD Office in the check
                 try {
                     const response = await fetch(
-                        `https://ai-backend-drcx.onrender.com/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${selectedSdOffice}`
+                        `http://localhost:9000/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${selectedSdOffice}`
                     );
                     if (response.ok) {
                         const data = await response.json();

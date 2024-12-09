@@ -65,7 +65,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
         const fetchCampusData = async () => {
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/sd-office/${localStorage.getItem(
+                    `http://localhost:9000/api/get/sd-office/${localStorage.getItem(
                         "user_id"
                     )}`
                 );
@@ -113,7 +113,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
 
             try {
                 const response = await fetch(
-                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
+                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (response.ok) {
                     const instrumentData = await response.json();
@@ -133,7 +133,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 const updatedInstruments = await Promise.all(
                     instrumentData.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `https://ai-backend-drcx.onrender.com/api/get/sectionsbyinstrument/${instrument.instrument_id}`
+                            `http://localhost:9000/api/get/sectionsbyinstrument/${instrument.instrument_id}`
                         );
                         if (sectionsResponse.ok) {
                             const sections = await sectionsResponse.json();
@@ -164,11 +164,11 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                     sections.map(async (section) => {
                         try {
                             const questionsResponse = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
+                                `http://localhost:9000/api/get/questions/${section.section_id}`
                             );
 
                             const fetchFormulas = await fetch(
-                                `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
+                                `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
                             );
                             const formula = await fetchFormulas.json();
 
@@ -421,7 +421,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
 
                     // Send the individual file request
                     const response = await fetch(
-                        `https://ai-backend-drcx.onrender.com/api/upload-evidence/${recordId}`,
+                        `http://localhost:9000/api/upload-evidence/${recordId}`,
                         {
                             method: "POST",
                             body: formData,
@@ -443,7 +443,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
     };
 
     const sendAnswers = async (recordId) => {
-        const url = "https://ai-backend-drcx.onrender.com/api/add/answers";
+        const url = "http://localhost:9000/api/add/answers";
         for (const answer of answers) {
             if (!answer.question_id || !answer.campus_id) {
                 console.error("Invalid answer data:", answer);
@@ -502,7 +502,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
         try {
             // Submit the record to the server
             const recordResponse = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/add/records",
+                "http://localhost:9000/api/add/records",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

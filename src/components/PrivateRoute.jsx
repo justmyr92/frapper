@@ -17,7 +17,7 @@ const PrivateRoute = ({ Component, Path }) => {
 
             try {
                 const response = await fetch(
-                    "https://ai-backend-drcx.onrender.com/api/validate-token",
+                    "http://localhost:9000/api/validate-token",
                     {
                         method: "POST",
                         headers: { jwt_token: token },

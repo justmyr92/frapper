@@ -25,7 +25,7 @@ const ViewInstrumentPage = () => {
     useEffect(() => {
         const fetchInstrument = async () => {
             const response = await fetch(
-                `https://ai-backend-drcx.onrender.com/api/get/instruments/${instrument_id}`
+                `http://localhost:9000/api/get/instruments/${instrument_id}`
             );
             const data = await response.json();
             setInstrument(data[0]);
@@ -37,7 +37,7 @@ const ViewInstrumentPage = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             const response = await fetch(
-                `https://ai-backend-drcx.onrender.com/api/get/questions/${instrument?.section_id}`
+                `http://localhost:9000/api/get/questions/${instrument?.section_id}`
             );
             const data = await response.json();
             setQuestions(data);
@@ -45,7 +45,7 @@ const ViewInstrumentPage = () => {
 
         const fetchFormula = async () => {
             const response = await fetch(
-                `https://ai-backend-drcx.onrender.com/api/get/formula/${instrument?.section_id}`
+                `http://localhost:9000/api/get/formula/${instrument?.section_id}`
             );
             const data = await response.json();
             setFormula(data[0]);
