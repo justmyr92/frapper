@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import { useNavigate, Link } from "react-router-dom"; // Import useNavigate
-//import FontAwesomeIcon
+import { useNavigate, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowLeft,
+    faTrash,
+    faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import NotificationSD from "../../components/NotificationSD";
 
@@ -57,20 +60,24 @@ const AddInstrumentPage = () => {
 
     const [instrumentData, setInstrumentData] = useState({
         sdg_id: "",
-        subtitle: "",
-        sections: [
+        subtitles: [
             {
-                content: "",
-                questions: [
+                subtitle: "",
+                sections: [
                     {
-                        questionId: "A1",
-                        questionText: "",
-                        questionType: "Number",
-                        suffix: "",
-                        options: [],
+                        content: "",
+                        questions: [
+                            {
+                                questionId: "A1",
+                                questionText: "",
+                                questionType: "Number",
+                                suffix: "",
+                                options: [],
+                            },
+                        ],
+                        formulas: [""],
                     },
                 ],
-                formulas: [""],
             },
         ],
     });
@@ -83,37 +90,17 @@ const AddInstrumentPage = () => {
         }));
     };
 
-    const handleSectionContentChange = (e, sectionIndex) => {
-        const { name, value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex][name] = value;
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const handleQuestionChange = (e, sectionIndex, questionIndex) => {
-        const { name, value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions[questionIndex][name] = value;
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const handleQuestionTypeChange = (e, sectionIndex, questionIndex) => {
+    const handleSectionContentChange = (e, subtitleIndex, sectionIndex) => {
         const { value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions[questionIndex].questionType =
-            value;
-        updatedSections[sectionIndex].questions[questionIndex].suffix = ""; // Reset suffix if changing type
-        updatedSections[sectionIndex].questions[questionIndex].options = []; // Reset options if changing type
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
+        setInstrumentData((prevData) => {
+            const updatedSubtitles = [...prevData.subtitles];
+            updatedSubtitles[subtitleIndex].sections[sectionIndex].content =
+                value;
+            return {
+                ...prevData,
+                subtitles: updatedSubtitles,
+            };
+        });
     };
 
     const generateQuestionId = (sectionIndex, questionIndex) => {
@@ -126,38 +113,95 @@ const AddInstrumentPage = () => {
         return `${sectionPrefix}${sectionIndex + 1}`;
     };
 
-    const addSection = () => {
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: [
-                ...prevData.sections,
-                {
-                    content: "",
-                    questions: [
-                        {
-                            questionId: generateQuestionId(
-                                prevData.sections.length,
-                                0
-                            ),
-                            questionText: "",
-                            questionType: "Number",
-                            suffix: "",
-                            options: [],
-                        },
-                    ],
-                    formulas: [""],
-                },
-            ],
-        }));
+    const removeSection = (subtitleIndex, sectionIndex) => {
+        setInstrumentData((prevData) => {
+            const updatedSubtitles = prevData.subtitles.map((subtitle, idx) =>
+                idx === subtitleIndex
+                    ? {
+                          ...subtitle,
+                          sections: subtitle.sections.filter(
+                              (_, i) => i !== sectionIndex
+                          ),
+                      }
+                    : subtitle
+            );
+
+            return {
+                ...prevData,
+                subtitles: updatedSubtitles,
+            };
+        });
     };
 
-    const removeSection = (index) => {
-        const updatedSections = instrumentData.sections.filter(
-            (_, i) => i !== index
-        );
+    const addSection = (subtitleIndex) => {
+        setInstrumentData((prevData) => {
+            const updatedSubtitles = prevData.subtitles.map((subtitle, idx) =>
+                idx === subtitleIndex
+                    ? {
+                          ...subtitle,
+                          sections: [
+                              ...subtitle.sections,
+                              {
+                                  content: "",
+                                  questions: [
+                                      {
+                                          questionId: generateQuestionId(
+                                              subtitle.sections.length,
+                                              0
+                                          ),
+                                          questionText: "",
+                                          questionType: "Number",
+                                          suffix: "",
+                                          options: [],
+                                      },
+                                  ],
+                                  formulas: [""],
+                              },
+                          ],
+                      }
+                    : subtitle
+            );
+
+            return {
+                ...prevData,
+                subtitles: updatedSubtitles,
+            };
+        });
+    };
+
+    const handleQuestionChange = (
+        e,
+        subtitleIndex,
+        sectionIndex,
+        questionIndex
+    ) => {
+        const { name, value } = e.target;
+
         setInstrumentData((prevData) => ({
             ...prevData,
-            sections: updatedSections,
+            subtitles: prevData.subtitles.map((subtitle, subIndex) =>
+                subIndex === subtitleIndex
+                    ? {
+                          ...subtitle,
+                          sections: subtitle.sections.map((section, secIndex) =>
+                              secIndex === sectionIndex
+                                  ? {
+                                        ...section,
+                                        questions: section.questions.map(
+                                            (question, qIndex) =>
+                                                qIndex === questionIndex
+                                                    ? {
+                                                          ...question,
+                                                          [name]: value,
+                                                      }
+                                                    : question
+                                        ),
+                                    }
+                                  : section
+                          ),
+                      }
+                    : subtitle
+            ),
         }));
     };
 
@@ -187,268 +231,24 @@ const AddInstrumentPage = () => {
         }));
     };
 
+    // Remove a question from a specific section dynamically
     const removeQuestion = (sectionIndex, questionIndex) => {
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions = updatedSections[
-            sectionIndex
-        ].questions.filter((_, i) => i !== questionIndex);
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
+        setInstrumentData((prevData) => {
+            const updatedSections = [...prevData.sections];
+            updatedSections[sectionIndex].questions = updatedSections[
+                sectionIndex
+            ].questions.filter((_, i) => i !== questionIndex);
+
+            return {
+                ...prevData,
+                sections: updatedSections,
+            };
+        });
     };
 
-    const addOption = (sectionIndex, questionIndex) => {
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions[questionIndex].options.push("");
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const handleOptionChange = (
-        e,
-        sectionIndex,
-        questionIndex,
-        optionIndex
-    ) => {
-        const { value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions[questionIndex].options[
-            optionIndex
-        ] = value;
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const removeOption = (sectionIndex, questionIndex, optionIndex) => {
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].questions[questionIndex].options =
-            updatedSections[sectionIndex].questions[
-                questionIndex
-            ].options.filter((_, i) => i !== optionIndex);
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const addFormula = (sectionIndex) => {
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: prevData.sections.map((section, idx) =>
-                idx === sectionIndex
-                    ? {
-                          ...section,
-                          formulas: [...section.formulas, ""], // Add an empty formula
-                      }
-                    : section
-            ),
-        }));
-    };
-    const handleFormulaChange = (e, sectionIndex, formulaIndex) => {
-        const { value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].formulas[formulaIndex] = value;
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const removeFormula = (sectionIndex, formulaIndex) => {
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].formulas = updatedSections[
-            sectionIndex
-        ].formulas.filter((_, i) => i !== formulaIndex);
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sections: updatedSections,
-        }));
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Show confirmation dialog
-        const result = await Swal.fire({
-            title: "Submit Instrument?",
-            text: "Are you sure you want to submit this instrument data?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, submit it!",
-            cancelButtonText: "No, cancel!",
-            reverseButtons: true,
-        });
-
-        if (!result.isConfirmed) {
-            return; // User canceled the submission
-        }
-
-        // Show loading indicator
-        Swal.fire({
-            title: "Submitting...",
-            text: "Please wait while the instrument is being submitted.",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            willOpen: () => {
-                Swal.showLoading();
-            },
-        });
-
-        try {
-            // Submit instrument data
-            const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/add/instruments",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        sdg_id: instrumentData.sdg_id,
-                        subtitle: instrumentData.subtitle,
-                    }),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to submit instrument data.");
-            }
-
-            const responseData = await response.json();
-
-            // Submit sections and questions
-            await Promise.all(
-                instrumentData.sections.map(async (section) => {
-                    const responseSection = await fetch(
-                        "https://ai-backend-drcx.onrender.com/api/add/sections",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                section_content: section.content,
-                                instrument_id: responseData.instrument_id,
-                            }),
-                        }
-                    );
-
-                    const responseSectionData = await responseSection.json();
-
-                    await Promise.all(
-                        section.questions.map(async (questionData) => {
-                            const responseQuestion = await fetch(
-                                "https://ai-backend-drcx.onrender.com/api/add/questions",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        question: questionData.questionText,
-                                        type: questionData.questionType,
-                                        suffix: questionData.suffix,
-                                        sub_id: questionData.questionId,
-                                        section_id:
-                                            responseSectionData.section_id,
-                                    }),
-                                }
-                            );
-                            if (!responseQuestion.ok) {
-                                throw new Error(
-                                    "Failed to submit question data."
-                                );
-                            }
-
-                            const responseQuestionData =
-                                await responseQuestion.json();
-
-                            if (
-                                questionData.questionType === "Multiple Options"
-                            ) {
-                                await Promise.all(
-                                    questionData.options.map(async (option) => {
-                                        const responseOption = await fetch(
-                                            "https://ai-backend-drcx.onrender.com/api/add/options",
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type":
-                                                        "application/json",
-                                                },
-                                                body: JSON.stringify({
-                                                    option,
-                                                    question_id:
-                                                        responseQuestionData.question_id,
-                                                }),
-                                            }
-                                        );
-                                        if (!responseOption.ok) {
-                                            throw new Error(
-                                                "Failed to submit options."
-                                            );
-                                        }
-                                    })
-                                );
-                            }
-                        })
-                    );
-
-                    // Submit formulas for the section
-                    await Promise.all(
-                        section.formulas.map(async (formula) => {
-                            const responseFormula = await fetch(
-                                "https://ai-backend-drcx.onrender.com/api/add/formulas",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        formula: formula,
-                                        section_id:
-                                            responseSectionData.section_id,
-                                    }),
-                                }
-                            );
-                            if (!responseFormula.ok) {
-                                throw new Error("Failed to submit formulas.");
-                            }
-                        })
-                    );
-                })
-            );
-
-            // Close loading spinner
-            Swal.close();
-
-            // Show success message
-            Swal.fire({
-                title: "Success!",
-                text: "The instrument has been submitted successfully.",
-                icon: "success",
-            });
-
-            navigate("/csd/instruments");
-        } catch (error) {
-            console.error("Error submitting instrument data:", error);
-
-            // Close loading spinner
-            Swal.close();
-
-            // Show error message
-            Swal.fire({
-                title: "Error",
-                text: "An error occurred while submitting the instrument. Please try again.",
-                icon: "error",
-            });
-        }
+        console.log(instrumentData);
     };
 
     return (
@@ -471,7 +271,7 @@ const AddInstrumentPage = () => {
                 <div className="py-5 px-7">
                     <form onSubmit={handleSubmit}>
                         <div className="border border-gray-500 rounded-md shadow px-3 py-5 flex gap-4">
-                            <div className="input-group mb-4 w-1/2">
+                            <div className="input-group mb-4">
                                 <label className="form-control w-full">
                                     <div className="label">
                                         <span className="label-text">
@@ -496,351 +296,148 @@ const AddInstrumentPage = () => {
                                     </select>
                                 </label>
                             </div>
-                            <div className="input-group mb-4 w-1/2">
-                                <label className="form-control w-full">
-                                    <div className="label">
-                                        <span className="label-text">
-                                            Subtitle
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="subtitle"
-                                        placeholder="Enter subtitle"
-                                        className="form__input border mt-1 block w-full p-2 rounded-md shadow-sm sm:text-sm focus:outline-none "
-                                        value={instrumentData.subtitle}
-                                        onChange={handleInputChange}
-                                        required={true}
-                                    />
-                                </label>
-                            </div>
                         </div>
                         <hr className="my-4" />
                         <div className="border px-3 py-2">
-                            {instrumentData.sections.map(
-                                (section, sectionIndex) => (
-                                    <div
-                                        key={sectionIndex}
-                                        className="section-group my-4"
-                                    >
-                                        <hr
-                                            className={`${
-                                                sectionIndex === 0
-                                                    ? "hidden my-4"
-                                                    : "my-4"
-                                            }`}
-                                        />
-                                        <div className="flex gap-2 justify-between items-end">
-                                            <div className="input-group w-[80%]">
-                                                <label className="form-control w-full">
-                                                    <div className="label">
-                                                        <span className="label-text">
-                                                            Content
-                                                        </span>
-                                                    </div>
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="content"
-                                                    placeholder="Enter content"
-                                                    className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
-                                                    value={section.content}
-                                                    onChange={(e) =>
-                                                        handleSectionContentChange(
-                                                            e,
-                                                            sectionIndex
-                                                        )
-                                                    }
-                                                />
+                            {instrumentData.subtitles.map(
+                                (subtitle, subtitleIndex) => (
+                                    <div key={subtitleIndex} className="mb-4">
+                                        <label className="form-control w-full">
+                                            <div className="label">
+                                                <span className="label-text">
+                                                    Subtitle
+                                                </span>
                                             </div>
-                                            <button
-                                                type="button"
-                                                className="bg-blue-600 text-white text-sm px-6 py-2 mt-2 h-fit"
-                                                onClick={() =>
-                                                    removeSection(sectionIndex)
+                                            <input
+                                                type="text"
+                                                placeholder="Enter subtitle"
+                                                className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
+                                                value={subtitle.subtitle}
+                                                onChange={(e) =>
+                                                    setInstrumentData(
+                                                        (prevData) => {
+                                                            const updatedSubtitles =
+                                                                [
+                                                                    ...prevData.subtitles,
+                                                                ];
+                                                            updatedSubtitles[
+                                                                subtitleIndex
+                                                            ].subtitle =
+                                                                e.target.value;
+                                                            return {
+                                                                ...prevData,
+                                                                subtitles:
+                                                                    updatedSubtitles,
+                                                            };
+                                                        }
+                                                    )
                                                 }
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faTrash}
-                                                />
-                                            </button>
-                                        </div>
-                                        {section.questions.map(
-                                            (question, questionIndex) => (
-                                                <div
-                                                    key={questionIndex}
-                                                    className="question-group my-4"
-                                                >
-                                                    <div className="flex gap-2 items-end">
-                                                        <div className="input-group w-[60%]">
-                                                            <label className="form-control w-full">
-                                                                <div className="label">
-                                                                    <span className="label-text">
-                                                                        {
-                                                                            question.questionId
-                                                                        }
-                                                                        .
-                                                                        Question{" "}
-                                                                    </span>
-                                                                </div>
-                                                                <input
-                                                                    type="text"
-                                                                    name="questionText"
-                                                                    placeholder="Enter question"
-                                                                    className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full   "
-                                                                    value={
-                                                                        question.questionText
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleQuestionChange(
-                                                                            e,
-                                                                            sectionIndex,
-                                                                            questionIndex
-                                                                        )
+                                            />
+                                        </label>
+                                        <div className="mt-2">
+                                            {subtitle.sections.map(
+                                                (section, sectionIndex) => (
+                                                    <div className="border p-4">
+                                                        <div
+                                                            key={sectionIndex}
+                                                            className="flex items-center gap-2 mb-2"
+                                                        >
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Enter section content"
+                                                                className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
+                                                                value={
+                                                                    section.content
+                                                                }
+                                                                onChange={(e) =>
+                                                                    handleSectionContentChange(
+                                                                        e,
+                                                                        subtitleIndex,
+                                                                        sectionIndex
+                                                                    )
+                                                                }
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                className="text-red-600"
+                                                                onClick={() =>
+                                                                    removeSection(
+                                                                        subtitleIndex,
+                                                                        sectionIndex
+                                                                    )
+                                                                }
+                                                            >
+                                                                <FontAwesomeIcon
+                                                                    icon={
+                                                                        faTrash
                                                                     }
                                                                 />
-                                                            </label>
+                                                            </button>
                                                         </div>
-                                                        {question.questionType ===
-                                                            "Number" && (
-                                                            <div className="input-group w-[15%]">
-                                                                <label className="form-control w-full max-w-xs">
-                                                                    <div className="label">
-                                                                        <span className="label-text">
-                                                                            Suffix
-                                                                            (Optional)
-                                                                        </span>
-                                                                    </div>
+                                                        {section.questions.map(
+                                                            (
+                                                                question,
+                                                                qIdx
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        question.questionId
+                                                                    }
+                                                                >
                                                                     <input
-                                                                        type="text"
-                                                                        name="suffix"
-                                                                        placeholder="e.g., %, kg"
-                                                                        className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
                                                                         value={
-                                                                            question.suffix
+                                                                            question.questionText
                                                                         }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleQuestionChange(
-                                                                                e,
-                                                                                sectionIndex,
-                                                                                questionIndex
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </label>
-                                                            </div>
-                                                        )}
-                                                        <div className="input-group w-[20%]">
-                                                            <label className="form-control w-full max-w-xs">
-                                                                <div className="label">
-                                                                    <span className="label-text">
-                                                                        Question
-                                                                        Type
-                                                                    </span>
-                                                                </div>
-                                                                <select
-                                                                    name="questionType"
-                                                                    className="form__input border mt-1 block p-2 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
-                                                                    value={
-                                                                        question.questionType
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleQuestionTypeChange(
-                                                                            e,
-                                                                            sectionIndex,
-                                                                            questionIndex
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option value="Number">
-                                                                        Number
-                                                                    </option>
-                                                                    <option value="Multiple Options">
-                                                                        Multiple
-                                                                        Options
-                                                                    </option>
-                                                                </select>
-                                                            </label>
-                                                        </div>
-
-                                                        <button
-                                                            type="button"
-                                                            className="bg-blue-600 text-white text-sm px-6 py-2 mt-2"
-                                                            onClick={() =>
-                                                                removeQuestion(
-                                                                    sectionIndex,
-                                                                    questionIndex
-                                                                )
-                                                            }
-                                                        >
-                                                            <FontAwesomeIcon
-                                                                icon={faTrash}
-                                                            />
-                                                        </button>
-                                                    </div>
-                                                    {question.questionType ===
-                                                        "Multiple Options" && (
-                                                        <div className="input-group">
-                                                            <label className="form-control w-[10%]">
-                                                                <div className="label">
-                                                                    <span className="label-text">
-                                                                        Options
-                                                                    </span>
-                                                                </div>
-                                                                {question.options.map(
-                                                                    (
-                                                                        option,
-                                                                        optionIndex
-                                                                    ) => (
-                                                                        <div
-                                                                            key={
-                                                                                optionIndex
-                                                                            }
-                                                                            className="flex gap-2"
-                                                                        >
-                                                                            <input
-                                                                                type="text"
-                                                                                placeholder="Enter option"
-                                                                                className="form__input border mt-1 block px-3 py-4 rounded-md shadow-sm sm:text-sm focus:outline-none w-full"
-                                                                                value={
-                                                                                    option
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleOptionChange(
-                                                                                        e,
-                                                                                        sectionIndex,
-                                                                                        questionIndex,
-                                                                                        optionIndex
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                            <button
-                                                                                type="button"
-                                                                                className="bg-blue-600 text-white text-sm px-6 py-2 mt-2"
-                                                                                onClick={() =>
-                                                                                    removeOption(
-                                                                                        sectionIndex,
-                                                                                        questionIndex,
-                                                                                        optionIndex
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                <FontAwesomeIcon
-                                                                                    icon={
-                                                                                        faTrash
-                                                                                    }
-                                                                                />
-                                                                            </button>
-                                                                        </div>
-                                                                    )
-                                                                )}
-                                                                <button
-                                                                    type="button"
-                                                                    className="bg-blue-600 text-white text-sm px-6 py-2 mt-2"
-                                                                    onClick={() =>
-                                                                        addOption(
-                                                                            sectionIndex,
-                                                                            questionIndex
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Add Option
-                                                                </button>
-                                                            </label>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )
-                                        )}
-                                        <button
-                                            type="button"
-                                            className="bg-blue-600 text-white text-sm px-6 py-2 mb-4 h-fit"
-                                            onClick={() =>
-                                                addQuestion(sectionIndex)
-                                            }
-                                        >
-                                            Add Question
-                                        </button>
-                                        {section.formulas &&
-                                            section.formulas.map(
-                                                (formula, formulaIndex) => (
-                                                    <div
-                                                        key={formulaIndex}
-                                                        className="formula-group my-2"
-                                                    >
-                                                        <div className="input-group w-full">
-                                                            <label className="form-control w-full">
-                                                                <div className="label">
-                                                                    <span className="label-text">
-                                                                        Formula
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex gap-2">
-                                                                    <textarea
-                                                                        placeholder="Enter formula"
-                                                                        className="form__input border mt-1 block px-3 py-4 rounded-md shadow-sm sm:text-sm focus:outline-none w-full h-32"
-                                                                        value={
-                                                                            formula
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleFormulaChange(
-                                                                                e,
-                                                                                sectionIndex,
-                                                                                formulaIndex
-                                                                            )
+                                                                        onChange={
+                                                                            (
+                                                                                e
+                                                                            ) =>
+                                                                                handleQuestionChange(
+                                                                                    e,
+                                                                                    idx,
+                                                                                    qIdx
+                                                                                ) // Handle question text change
                                                                         }
                                                                     />
                                                                     <button
-                                                                        type="button"
-                                                                        className="bg-blue-600 text-white text-sm px-6 py-2 mt-2 h-fit"
                                                                         onClick={() =>
-                                                                            removeFormula(
-                                                                                sectionIndex,
-                                                                                formulaIndex
+                                                                            removeQuestion(
+                                                                                idx,
+                                                                                qIdx
                                                                             )
                                                                         }
                                                                     >
-                                                                        <FontAwesomeIcon
-                                                                            icon={
-                                                                                faTrash
-                                                                            }
-                                                                        />
+                                                                        Remove
                                                                     </button>
                                                                 </div>
-                                                            </label>
-                                                        </div>
+                                                            )
+                                                        )}
+                                                        <button
+                                                            onClick={() =>
+                                                                addQuestion(idx)
+                                                            }
+                                                        >
+                                                            Add Question
+                                                        </button>
                                                     </div>
                                                 )
                                             )}
-                                        <button
-                                            type="button"
-                                            className="bg-blue-600 text-white text-sm px-6 py-2 mt-2"
-                                            onClick={() =>
-                                                addFormula(sectionIndex)
-                                            }
-                                        >
-                                            Add Formula
-                                        </button>
+                                            <button
+                                                type="button"
+                                                className="text-blue-600 text-sm mt-2"
+                                                onClick={() =>
+                                                    addSection(subtitleIndex)
+                                                }
+                                            >
+                                                <FontAwesomeIcon
+                                                    icon={faPlus}
+                                                />{" "}
+                                                Add Section
+                                            </button>
+                                        </div>
                                     </div>
                                 )
                             )}
-                            <button
-                                type="button"
-                                className="bg-blue-600 text-white text-sm px-6 py-2 mb-4 h-fit"
-                                onClick={addSection}
-                            >
-                                Add Section
-                            </button>
                         </div>
                         <hr />
                         <button

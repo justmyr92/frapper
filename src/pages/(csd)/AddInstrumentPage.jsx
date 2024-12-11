@@ -46,6 +46,8 @@ const AddInstrumentPage = () => {
 
     const navigate = useNavigate();
 
+    const [usedID, setUsedID] = useState(["A1"]);
+
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
         const role = localStorage.getItem("role");
@@ -79,6 +81,36 @@ const AddInstrumentPage = () => {
             },
         ],
     });
+
+    const addSubtitle = () => {
+        setInstrumentData((prevState) => ({
+            ...prevState,
+            subtitles: [
+                ...prevState.subtitles,
+                {
+                    subtitle: "",
+                    sections: [
+                        {
+                            content: "",
+                            questions: [
+                                {
+                                    questionId: generateQuestionId(
+                                        prevState.subtitles.length + 1,
+                                        0 // First question in the new section
+                                    ),
+                                    questionText: "",
+                                    questionType: "Number",
+                                    suffix: "",
+                                    options: [],
+                                },
+                            ],
+                            formulas: [""],
+                        },
+                    ],
+                },
+            ],
+        }));
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -210,38 +242,63 @@ const AddInstrumentPage = () => {
     const generateQuestionId = (sectionIndex, questionIndex) => {
         // Determine the letter prefix based on the section index
         const sectionPrefix = String.fromCharCode(
-            "A".charCodeAt(0) + questionIndex
+            "A".charCodeAt(0) + (sectionIndex % 26)
         );
 
-        // Append the section index + 1 as the number
-        return `${sectionPrefix}${sectionIndex + 1}`;
+        // Initialize the state for the section prefix if it doesn't exist
+        setUsedID((prevUsedID) => {
+            const updatedUsedID = { ...prevUsedID };
+            if (!updatedUsedID[sectionPrefix]) {
+                updatedUsedID[sectionPrefix] = [];
+            }
+
+            // Add the current question index to the section prefix's list
+            if (!updatedUsedID[sectionPrefix].includes(questionIndex + 1)) {
+                updatedUsedID[sectionPrefix].push(questionIndex + 1);
+            }
+
+            return updatedUsedID;
+        });
+
+        // Return the unique ID
+        return `${sectionPrefix}${questionIndex + 1}`;
     };
 
     const addSection = () => {
-        setInstrumentData((prevData) => ({
-            ...prevData,
-            sdg_id: "",
-            subtitles: [
-                {
-                    subtitle: "",
-                    sections: [
-                        {
-                            content: "",
-                            questions: [
-                                {
-                                    questionId: "",
-                                    questionText: "",
-                                    questionType: "Number",
-                                    suffix: "",
-                                    options: [],
-                                },
-                            ],
-                            formulas: [""],
-                        },
-                    ],
-                },
-            ],
-        }));
+        setInstrumentData((prevData) => {
+            // Find the index of the last subtitle
+            const lastSubtitleIndex = prevData.subtitles.length - 1;
+
+            return {
+                ...prevData,
+                subtitles: prevData.subtitles.map((subtitle, idx) =>
+                    idx === lastSubtitleIndex
+                        ? {
+                              ...subtitle,
+                              sections: [
+                                  ...subtitle.sections,
+                                  {
+                                      content: "",
+                                      questions: [
+                                          {
+                                              questionId: generateQuestionId(
+                                                  subtitle.sections.length, // Use the new section's index
+                                                  0 // First question in the new section
+                                              ),
+                                              questionText: "",
+                                              questionType: "Number",
+                                              suffix: "",
+                                              options: [],
+                                          },
+                                      ],
+                                      formulas: [""],
+                                  },
+                              ],
+                          }
+                        : subtitle
+                ),
+            };
+        });
     };
 
     const removeSection = (index) => {
@@ -287,59 +344,35 @@ const AddInstrumentPage = () => {
         });
     };
 
-    const removeOption = (
-        subtitleIndex,
-        sectionIndex,
-        questionIndex,
-        optionIndex
-    ) => {
-        setInstrumentData((prevData) => {
-            const updatedSubtitles = [...prevData.subtitles];
-
-            const targetSubtitle = { ...updatedSubtitles[subtitleIndex] };
-            const updatedSections = [...targetSubtitle.sections];
-            const targetSection = { ...updatedSections[sectionIndex] };
-            const updatedQuestions = [...targetSection.questions];
-            const targetQuestion = { ...updatedQuestions[questionIndex] };
-
-            // Remove the specific option
-            const updatedOptions = targetQuestion.options.filter(
-                (_, i) => i !== optionIndex
-            );
-
-            targetQuestion.options = updatedOptions;
-            updatedQuestions[questionIndex] = targetQuestion;
-            targetSection.questions = updatedQuestions;
-            updatedSections[sectionIndex] = targetSection;
-            targetSubtitle.sections = updatedSections;
-            updatedSubtitles[subtitleIndex] = targetSubtitle;
-
-            return { ...prevData, subtitles: updatedSubtitles };
-        });
-    };
-
-    const addQuestion = (sectionIndex) => {
+    const addQuestion = (subtitleIndex, sectionIndex) => {
         setInstrumentData((prevData) => ({
             ...prevData,
-            sections: prevData.sections.map((section, idx) =>
-                idx === sectionIndex
+            subtitles: prevData.subtitles.map((subtitle, subIdx) =>
+                subIdx === subtitleIndex
                     ? {
-                          ...section,
-                          questions: [
-                              ...section.questions,
-                              {
-                                  questionId: generateQuestionId(
-                                      sectionIndex,
-                                      section.questions.length
-                                  ),
-                                  questionText: "",
-                                  questionType: "Number",
-                                  suffix: "",
-                                  options: [],
-                              },
-                          ],
+                          ...subtitle,
+                          sections: subtitle.sections.map((section, secIdx) =>
+                              secIdx === sectionIndex
+                                  ? {
+                                        ...section,
+                                        questions: [
+                                            ...section.questions,
+                                            {
+                                                questionId: generateQuestionId(
+                                                    subtitleIndex,
+                                                    section.questions.length
+                                                ),
+                                                questionText: "",
+                                                questionType: "Number",
+                                                suffix: "",
+                                                options: [],
+                                            },
+                                        ],
+                                    }
+                                  : section
+                          ),
                       }
-                    : section
+                    : subtitle
             ),
         }));
     };
@@ -353,45 +386,6 @@ const AddInstrumentPage = () => {
             ...prevData,
             sections: updatedSections,
         }));
-    };
-
-    const addOption = (subtitleIndex, sectionIndex, questionIndex) => {
-        setInstrumentData((prevData) => {
-            const updatedSubtitles = [...prevData.subtitles];
-
-            // Deeply clone the specific subtitle
-            const targetSubtitle = { ...updatedSubtitles[subtitleIndex] };
-
-            // Clone the sections array
-            const updatedSections = [...targetSubtitle.sections];
-
-            // Clone the specific section
-            const targetSection = { ...updatedSections[sectionIndex] };
-
-            // Clone the specific question
-            const updatedQuestions = [...targetSection.questions];
-            const targetQuestion = { ...updatedQuestions[questionIndex] };
-
-            // Add a new option
-            targetQuestion.options = [...targetQuestion.options, ""];
-
-            // Update the questions array
-            updatedQuestions[questionIndex] = targetQuestion;
-
-            // Update the section
-            targetSection.questions = updatedQuestions;
-
-            // Update the sections array
-            updatedSections[sectionIndex] = targetSection;
-
-            // Update the subtitle
-            targetSubtitle.sections = updatedSections;
-
-            // Update the subtitles array
-            updatedSubtitles[subtitleIndex] = targetSubtitle;
-
-            return { ...prevData, subtitles: updatedSubtitles };
-        });
     };
 
     const addOption = (subtitleIndex, sectionIndex, questionIndex) => {
@@ -478,13 +472,36 @@ const AddInstrumentPage = () => {
         }));
     };
 
-    const handleFormulaChange = (e, sectionIndex, formulaIndex) => {
+    const handleFormulaChange = (
+        e,
+        subtitleIndex,
+        sectionIndex,
+        formulaIndex
+    ) => {
         const { value } = e.target;
-        const updatedSections = [...instrumentData.sections];
-        updatedSections[sectionIndex].formulas[formulaIndex] = value;
+
         setInstrumentData((prevData) => ({
             ...prevData,
-            sections: updatedSections,
+            subtitles: prevData.subtitles.map((subtitle, subIdx) =>
+                subIdx === subtitleIndex
+                    ? {
+                          ...subtitle,
+                          sections: subtitle.sections.map((section, secIdx) =>
+                              secIdx === sectionIndex
+                                  ? {
+                                        ...section,
+                                        formulas: section.formulas.map(
+                                            (formula, formIdx) =>
+                                                formIdx === formulaIndex
+                                                    ? value
+                                                    : formula
+                                        ),
+                                    }
+                                  : section
+                          ),
+                      }
+                    : subtitle
+            ),
         }));
     };
 
@@ -503,7 +520,6 @@ const AddInstrumentPage = () => {
         e.preventDefault();
 
         console.log(instrumentData, "data");
-        return;
 
         // Show confirmation dialog
         const result = await Swal.fire({
@@ -533,32 +549,32 @@ const AddInstrumentPage = () => {
         });
 
         try {
-            // Submit instrument data
-            const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/add/instruments",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        sdg_id: instrumentData.sdg_id,
-                        subtitle: instrumentData.subtitle,
-                    }),
+            for (const subtitle of instrumentData.subtitles) {
+                // Submit the subtitle
+                const subtitleResponse = await fetch(
+                    "http://localhost:9000/api/add/instruments",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            sdg_id: instrumentData.sdg_id,
+                            subtitle: subtitle.subtitle,
+                        }),
+                    }
+                );
+
+                if (!subtitleResponse.ok) {
+                    throw new Error("Failed to submit subtitle.");
                 }
-            );
 
-            if (!response.ok) {
-                throw new Error("Failed to submit instrument data.");
-            }
+                const subtitleData = await subtitleResponse.json();
 
-            const responseData = await response.json();
-
-            // Submit sections and questions
-            await Promise.all(
-                instrumentData.sections.map(async (section) => {
-                    const responseSection = await fetch(
-                        "https://ai-backend-drcx.onrender.com/api/add/sections",
+                for (const section of subtitle.sections) {
+                    // Submit the section
+                    const sectionResponse = await fetch(
+                        "http://localhost:9000/api/add/sections",
                         {
                             method: "POST",
                             headers: {
@@ -566,96 +582,91 @@ const AddInstrumentPage = () => {
                             },
                             body: JSON.stringify({
                                 section_content: section.content,
-                                instrument_id: responseData.instrument_id,
+                                subtitle_id: subtitleData.subtitle_id,
                             }),
                         }
                     );
 
-                    const responseSectionData = await responseSection.json();
+                    if (!sectionResponse.ok) {
+                        throw new Error("Failed to submit section.");
+                    }
 
-                    await Promise.all(
-                        section.questions.map(async (questionData) => {
-                            const responseQuestion = await fetch(
-                                "https://ai-backend-drcx.onrender.com/api/add/questions",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        question: questionData.questionText,
-                                        type: questionData.questionType,
-                                        suffix: questionData.suffix,
-                                        sub_id: questionData.questionId,
-                                        section_id:
-                                            responseSectionData.section_id,
-                                    }),
+                    const sectionData = await sectionResponse.json();
+
+                    for (const question of section.questions) {
+                        // Submit the question
+                        const questionResponse = await fetch(
+                            "http://localhost:9000/api/add/questions",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    question: question.questionText,
+                                    type: question.questionType,
+                                    suffix: question.suffix,
+                                    sub_id: question.questionId,
+                                    section_id: sectionData.section_id,
+                                }),
+                            }
+                        );
+
+                        if (!questionResponse.ok) {
+                            throw new Error("Failed to submit question.");
+                        }
+
+                        const questionData = await questionResponse.json();
+
+                        // Submit options if the question type is "Multiple Options"
+                        if (question.questionType === "Multiple Options") {
+                            for (const option of question.options) {
+                                const optionResponse = await fetch(
+                                    "http://localhost:9000/api/add/options",
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            option,
+                                            question_id:
+                                                questionData.question_id,
+                                        }),
+                                    }
+                                );
+
+                                if (!optionResponse.ok) {
+                                    throw new Error(
+                                        "Failed to submit options."
+                                    );
                                 }
-                            );
-                            if (!responseQuestion.ok) {
-                                throw new Error(
-                                    "Failed to submit question data."
-                                );
                             }
-
-                            const responseQuestionData =
-                                await responseQuestion.json();
-
-                            if (
-                                questionData.questionType === "Multiple Options"
-                            ) {
-                                await Promise.all(
-                                    questionData.options.map(async (option) => {
-                                        const responseOption = await fetch(
-                                            "https://ai-backend-drcx.onrender.com/api/add/options",
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type":
-                                                        "application/json",
-                                                },
-                                                body: JSON.stringify({
-                                                    option,
-                                                    question_id:
-                                                        responseQuestionData.question_id,
-                                                }),
-                                            }
-                                        );
-                                        if (!responseOption.ok) {
-                                            throw new Error(
-                                                "Failed to submit options."
-                                            );
-                                        }
-                                    })
-                                );
-                            }
-                        })
-                    );
+                        }
+                    }
 
                     // Submit formulas for the section
-                    await Promise.all(
-                        section.formulas.map(async (formula) => {
-                            const responseFormula = await fetch(
-                                "https://ai-backend-drcx.onrender.com/api/add/formulas",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        formula: formula,
-                                        section_id:
-                                            responseSectionData.section_id,
-                                    }),
-                                }
-                            );
-                            if (!responseFormula.ok) {
-                                throw new Error("Failed to submit formulas.");
+                    for (const formula of section.formulas) {
+                        const formulaResponse = await fetch(
+                            "http://localhost:9000/api/add/formulas",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    formula,
+                                    section_id: sectionData.section_id,
+                                }),
                             }
-                        })
-                    );
-                })
-            );
+                        );
+
+                        if (!formulaResponse.ok) {
+                            throw new Error("Failed to submit formulas.");
+                        }
+                    }
+                }
+            }
 
             // Close loading spinner
             Swal.close();
@@ -703,7 +714,7 @@ const AddInstrumentPage = () => {
                 <div className="py-5 px-7">
                     <form onSubmit={handleSubmit}>
                         <div className="border border-gray-500 rounded-md shadow px-3 py-5 flex gap-4">
-                            <div className="input-group mb-4 w-1/2">
+                            <div className="input-group mb-4">
                                 <label className="form-control w-full">
                                     <div className="label">
                                         <span className="label-text">
@@ -752,7 +763,7 @@ const AddInstrumentPage = () => {
                             {instrumentData.subtitles.map(
                                 (subtitle, subtitleIndex) => (
                                     <div
-                                        className="input-group mb-4 w-1/2"
+                                        className="input-group mb-4"
                                         key={subtitleIndex}
                                     >
                                         <label className="form-control w-full">
@@ -815,7 +826,7 @@ const AddInstrumentPage = () => {
                                                                         sectionIndex
                                                                     )
                                                                 }
-                                                                className="input input-bordered"
+                                                                className="form__input border mt-1 block w-full p-2 rounded-md shadow-sm sm:text-sm focus:outline-none"
                                                             />
                                                         </div>
                                                         <button
@@ -844,7 +855,7 @@ const AddInstrumentPage = () => {
                                                                 className="question-group my-4"
                                                             >
                                                                 <div className="flex gap-2 items-end">
-                                                                    <div className="input-group w-[60%]">
+                                                                    <div className="input-group w-[80%]">
                                                                         <label className="form-control w-full">
                                                                             <div className="label">
                                                                                 <span className="label-text">
@@ -881,50 +892,11 @@ const AddInstrumentPage = () => {
                                                                                         questionIndex
                                                                                     )
                                                                                 }
-                                                                                className="input input-bordered"
+                                                                                className="form__input border mt-1 block w-full p-2 rounded-md shadow-sm sm:text-sm focus:outline-none"
                                                                             />
                                                                         </label>
                                                                     </div>
-                                                                    {question.questionType ===
-                                                                        "Number" && (
-                                                                        <div className="input-group w-[15%]">
-                                                                            <label className="form-control w-full max-w-xs">
-                                                                                <div className="label">
-                                                                                    <span className="label-text">
-                                                                                        Suffix
-                                                                                        (Optional)
-                                                                                    </span>
-                                                                                </div>
-                                                                                <input
-                                                                                    name="questionText"
-                                                                                    value={
-                                                                                        instrumentData
-                                                                                            .subtitles[
-                                                                                            subtitleIndex
-                                                                                        ]
-                                                                                            .sections[
-                                                                                            sectionIndex
-                                                                                        ]
-                                                                                            .questions[
-                                                                                            questionIndex
-                                                                                        ]
-                                                                                            .questionText
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleQuestionChange(
-                                                                                            e,
-                                                                                            subtitleIndex,
-                                                                                            sectionIndex,
-                                                                                            questionIndex
-                                                                                        )
-                                                                                    }
-                                                                                    className="input input-bordered"
-                                                                                />
-                                                                            </label>
-                                                                        </div>
-                                                                    )}
+
                                                                     <div className="input-group w-[20%]">
                                                                         <label className="form-control w-full max-w-xs">
                                                                             <div className="label">
@@ -957,7 +929,7 @@ const AddInstrumentPage = () => {
                                                                                         questionIndex
                                                                                     )
                                                                                 }
-                                                                                className="select select-bordered"
+                                                                                className="form__input border mt-1 block w-full p-2 rounded-md shadow-sm sm:text-sm focus:outline-none"
                                                                             >
                                                                                 <option value="Number">
                                                                                     Number
@@ -1078,6 +1050,7 @@ const AddInstrumentPage = () => {
                                                         className="bg-blue-600 text-white text-sm px-6 py-2 mb-4 h-fit"
                                                         onClick={() =>
                                                             addQuestion(
+                                                                subtitleIndex,
                                                                 sectionIndex
                                                             )
                                                         }
@@ -1115,6 +1088,7 @@ const AddInstrumentPage = () => {
                                                                                     ) =>
                                                                                         handleFormulaChange(
                                                                                             e,
+                                                                                            subtitleIndex,
                                                                                             sectionIndex,
                                                                                             formulaIndex
                                                                                         )
@@ -1156,19 +1130,28 @@ const AddInstrumentPage = () => {
                                                 </div>
                                             )
                                         )}
+                                        <hr />
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                className="bg-blue-600 text-white text-sm px-6 py-2 my-4 h-fit"
+                                                onClick={addSection}
+                                            >
+                                                Add Section
+                                            </button>
+                                            <button
+                                                onClick={addSubtitle}
+                                                className="bg-blue-600 text-white text-sm px-6 py-2 my-4 h-fit"
+                                            >
+                                                Add Subtitle
+                                            </button>
+                                        </div>
                                     </div>
                                 )
                             )}
-
-                            <button
-                                type="button"
-                                className="bg-blue-600 text-white text-sm px-6 py-2 mb-4 h-fit"
-                                onClick={addSection}
-                            >
-                                Add Section
-                            </button>
                         </div>
                         <hr />
+
                         <button
                             type="submit"
                             className="bg-blue-600 text-white text-sm float-end px-6 py-2 my-2"

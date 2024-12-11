@@ -15,7 +15,7 @@ const AnnualReportPage = () => {
     const fetchReports = async () => {
         try {
             const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/get/annual-reports"
+                "http://localhost:9000/api/get/annual-reports"
             );
             const result = await response.json();
             console.log(result, "asd");
@@ -50,7 +50,7 @@ const AnnualReportPage = () => {
             setIsUploading(true);
 
             const response = await fetch(
-                "https://ai-backend-drcx.onrender.com/api/upload-annual-report",
+                "http://localhost:9000/api/upload-annual-report",
                 {
                     method: "POST",
                     body: formData,
