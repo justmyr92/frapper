@@ -43,7 +43,7 @@ const SDDashboardPage = () => {
         const getSDOfficers = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9000/api/get/sd-office"
+                    "https://ai-backend-drcx.onrender.com/api/get/sd-office"
                 );
                 const jsonData = await response.json();
                 setSdOfficers(jsonData);

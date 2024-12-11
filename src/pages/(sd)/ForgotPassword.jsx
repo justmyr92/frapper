@@ -22,13 +22,16 @@ const ForgotPassword = () => {
     // Handle sending OTP
     const handleSendOtp = async () => {
         try {
-            const response = await fetch("http://localhost:9000/api/send-otp", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email: loginCredentials.email }),
-            });
+            const response = await fetch(
+                "https://ai-backend-drcx.onrender.com/api/send-otp",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email: loginCredentials.email }),
+                }
+            );
             const data = await response.json();
 
             if (data.success) {
@@ -89,7 +92,7 @@ const ForgotPassword = () => {
         e.preventDefault();
         try {
             const response = await fetch(
-                "http://localhost:9000/api/verify-otp",
+                "https://ai-backend-drcx.onrender.com/api/verify-otp",
                 {
                     method: "POST",
                     headers: {
@@ -128,7 +131,7 @@ const ForgotPassword = () => {
         }
         try {
             const response = await fetch(
-                "http://localhost:9000/api/reset-password",
+                "https://ai-backend-drcx.onrender.com/api/reset-password",
                 {
                     method: "PATCH",
                     headers: {

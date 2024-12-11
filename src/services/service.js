@@ -1,4 +1,4 @@
-const URL = "http://localhost:9000";
+const URL = "https://ai-backend-drcx.onrender.com";
 
 export const loginSubmit = async (loginCredentials) => {
     try {

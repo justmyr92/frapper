@@ -155,7 +155,7 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
     useEffect(() => {
         const fetchCampuses = async () => {
             const response = await fetch(
-                "http://localhost:9000/api/get/campuses"
+                "https://ai-backend-drcx.onrender.com/api/get/campuses"
             );
             const data = await response.json();
             setCampuses(data);
@@ -163,13 +163,13 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
         const fetchRecords = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/records-values-by-sdg_id/${selectedSdg}/${selectedYear}`
+                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-sdg_id/${selectedSdg}/${selectedYear}`
                 );
                 const data = await response.json();
                 console.log(data, "ASdasd");
 
                 const section_response = await fetch(
-                    `http://localhost:9000/api/get/sections/${selectedSdg}`
+                    `https://ai-backend-drcx.onrender.com/api/get/sections/${selectedSdg}`
                 );
 
                 const sectionss = await section_response.json();
@@ -187,7 +187,7 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
                     let temp_formula = [];
                     for (const section_id of uniqueSectionIds) {
                         const response = await fetch(
-                            `http://localhost:9000/api/get/formula/${section_id}`
+                            `https://ai-backend-drcx.onrender.com/api/get/formula/${section_id}`
                         );
                         const formula = await response.json();
                         temp_formula.push(formula[0]);
@@ -234,7 +234,7 @@ const ScorePerCampusChart = ({ setScores, setTopCampus, selectedYear }) => {
     return (
         <Card className="w-[100%]">
             <h3 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                Score per Campus
+                Campus Scores Per SDGS
             </h3>
             <div className="grid grid-cols-10 gap-2 mt-4">
                 {sdgs.map((sdg) => (

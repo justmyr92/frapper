@@ -55,7 +55,7 @@ const UpdateRecordStatus = ({
         const fetchExistingAnswers = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/answers/${recordId}`
+                    `https://ai-backend-drcx.onrender.com/api/get/answers/${recordId}`
                 );
                 if (!response.ok) {
                     throw new Error("Failed to fetch answers");
@@ -77,7 +77,7 @@ const UpdateRecordStatus = ({
         const fetchCampusData = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/sd-office/${selectedSD}`
+                    `https://ai-backend-drcx.onrender.com/api/get/sd-office/${selectedSD}`
                 );
 
                 if (response.ok) {
@@ -119,7 +119,7 @@ const UpdateRecordStatus = ({
 
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
+                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (response.ok) {
                     const instrumentData = await response.json();
@@ -137,7 +137,7 @@ const UpdateRecordStatus = ({
                 const updatedInstruments = await Promise.all(
                     instrumentData.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `http://localhost:9000/api/get/sectionsbyinstrument/${instrument.instrument_id}`
+                            `https://ai-backend-drcx.onrender.com/api/get/sectionsbyinstrument/${instrument.instrument_id}`
                         );
                         if (sectionsResponse.ok) {
                             const sections = await sectionsResponse.json();
@@ -166,15 +166,15 @@ const UpdateRecordStatus = ({
                     sections.map(async (section) => {
                         try {
                             const questionsResponse = await fetch(
-                                `http://localhost:9000/api/get/questions/${section.section_id}`
+                                `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
                             );
                             const fetchFormulas = await fetch(
-                                `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
+                                `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
                             );
 
                             const formula = await fetchFormulas.json();
                             const fetchEvidenceResponse = await fetch(
-                                `http://localhost:9000/api/get/evidence/`,
+                                `https://ai-backend-drcx.onrender.com/api/get/evidence/`,
                                 {
                                     method: "POST",
                                     headers: {
@@ -356,7 +356,7 @@ const UpdateRecordStatus = ({
             const updatedFormulasV = uniqueFormulas.map((formulaObj) => {
                 const updatedFormula = replaceFormulaValues(
                     formulaObj.formula,
-                    valueMapBySection[formulaObj.section_id]
+                    valueMap
                 );
                 console.log(updatedFormula, valueMap, "Updated Formula");
 
@@ -424,7 +424,7 @@ const UpdateRecordStatus = ({
             };
 
             const response = await fetch(
-                "http://localhost:9000/api/update/status",
+                "https://ai-backend-drcx.onrender.com/api/update/status",
                 {
                     method: "PATCH",
                     headers: {
@@ -582,7 +582,7 @@ const UpdateRecordStatus = ({
 
                 // Create a notification
                 await fetch(
-                    "http://localhost:9000/api/csd/create-notification",
+                    "https://ai-backend-drcx.onrender.com/api/csd/create-notification",
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },

@@ -79,13 +79,13 @@ const EditInstrument = () => {
             try {
                 // Fetch instrument data
                 const iResponse = await fetch(
-                    `http://localhost:9000/api/get/instrument-by-instrument-id/${instrument_id}`
+                    `https://ai-backend-drcx.onrender.com/api/get/instrument-by-instrument-id/${instrument_id}`
                 );
                 const iData = await iResponse.json();
                 console.log(iData, "asd");
                 // Fetch sections data
                 const sectionsResponse = await fetch(
-                    `http://localhost:9000/api/get/section-by-instrument-id/${instrument_id}`
+                    `https://ai-backend-drcx.onrender.com/api/get/section-by-instrument-id/${instrument_id}`
                 );
                 const sectionsData = await sectionsResponse.json();
 
@@ -93,7 +93,7 @@ const EditInstrument = () => {
                 // const sectionsWithQuestions = await Promise.all(
                 //     sectionsData.map(async (section) => {
                 //         const questionsResponse = await fetch(
-                //             `http://localhost:9000/api/get/questions/${section.section_id}`
+                //             `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
                 //         );
                 //         const questionsData = await questionsResponse.json();
 
@@ -106,7 +106,7 @@ const EditInstrument = () => {
                 //                 questionType: question.type,
                 //                 suffix: question.suffix || "",
                 //                 options: await fetch(
-                //                     `http://localhost:9000/api/get/options/${question.question_id}`
+                //                     `https://ai-backend-drcx.onrender.com/api/get/options/${question.question_id}`
                 //                 ).then((response) => response.json()),
                 //             })
                 //         );
@@ -124,7 +124,7 @@ const EditInstrument = () => {
                 const sectionsWithQuestions = await Promise.all(
                     sectionsData.map(async (section) => {
                         const questionsResponse = await fetch(
-                            `http://localhost:9000/api/get/questions/${section.section_id}`
+                            `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
                         );
                         const questionsData = await questionsResponse.json();
 
@@ -132,7 +132,7 @@ const EditInstrument = () => {
                         const questions = await Promise.all(
                             questionsData.map(async (question) => {
                                 const optionsResponse = await fetch(
-                                    `http://localhost:9000/api/get/options/${question.question_id}`
+                                    `https://ai-backend-drcx.onrender.com/api/get/options/${question.question_id}`
                                 );
                                 const optionsData =
                                     await optionsResponse.json();
@@ -332,7 +332,7 @@ const EditInstrument = () => {
         const updatedInstrument = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/update/instrument/${instrumentData.instrument_id}`,
+                    `https://ai-backend-drcx.onrender.com/api/update/instrument/${instrumentData.instrument_id}`,
                     {
                         method: "PATCH",
                         headers: {
@@ -351,7 +351,7 @@ const EditInstrument = () => {
                         // Update or add sections
                         if (section.section_id) {
                             const response = await fetch(
-                                `http://localhost:9000/api/update/section/${section.section_id}`,
+                                `https://ai-backend-drcx.onrender.com/api/update/section/${section.section_id}`,
                                 {
                                     method: "PATCH",
                                     headers: {
@@ -365,7 +365,7 @@ const EditInstrument = () => {
                             const data = await response.json();
                         } else {
                             const response = await fetch(
-                                `http://localhost:9000/api/add/sections/`,
+                                `https://ai-backend-drcx.onrender.com/api/add/sections/`,
                                 {
                                     method: "POST",
                                     headers: {
@@ -387,7 +387,7 @@ const EditInstrument = () => {
                             if (question.question_id) {
                                 // Update existing question
                                 const response = await fetch(
-                                    `http://localhost:9000/api/update/question/${question.question_id}`,
+                                    `https://ai-backend-drcx.onrender.com/api/update/question/${question.question_id}`,
                                     {
                                         method: "PATCH",
                                         headers: {
@@ -405,7 +405,7 @@ const EditInstrument = () => {
                             } else {
                                 // Add new question
                                 const response = await fetch(
-                                    `http://localhost:9000/api/add/questions/`,
+                                    `https://ai-backend-drcx.onrender.com/api/add/questions/`,
                                     {
                                         method: "POST",
                                         headers: {
@@ -431,7 +431,7 @@ const EditInstrument = () => {
                                     if (option.option_id) {
                                         // Update existing option
                                         const response = await fetch(
-                                            `http://localhost:9000/api/update/options/${option.option_id}`,
+                                            `https://ai-backend-drcx.onrender.com/api/update/options/${option.option_id}`,
                                             {
                                                 method: "PATCH",
                                                 headers: {
@@ -447,7 +447,7 @@ const EditInstrument = () => {
                                     } else {
                                         // Add new option
                                         const response = await fetch(
-                                            `http://localhost:9000/api/add/options/`,
+                                            `https://ai-backend-drcx.onrender.com/api/add/options/`,
                                             {
                                                 method: "POST",
                                                 headers: {

@@ -143,20 +143,6 @@ const Recommender = ({ selectedYear }) => {
     ]);
     const [selectedSdG, setSelectedSdg] = useState("SDG01");
 
-    // const [instruments, setInstruments] = useState([]);
-
-    // useEffect(() => {
-    //     const fetchInstruments = async () => {
-    //         const response = await fetch(
-    //             ///get/instrumentsbysdg/:sdg_id
-    //             `http://localhost:9000/api/instrumentsbysdg/${selectedSdG}`
-    //         );
-    //         const data = await response.json();
-    //         setInstruments(data);
-    //     };
-    //     fetchInstruments();
-    // }, [selectedSdG]);
-
     const fetchRecommendations = async (score, sdg_id) => {
         if (score) {
             // Collect SDGs with total scores below 100
@@ -169,14 +155,14 @@ const Recommender = ({ selectedYear }) => {
 
             // Loop through each SDG and fetch recommendations
             for (const record of sdgsWithLowScores) {
-                console.log(record, "hahaha");
-
                 const prompt = `
                 For campus: ${record.campus_name}, 
                 analyze the following SDG by providing a more in depth analysis or insignts based on the records: ${
                     record.sdg_no
                 }.
-                The total score is ${record.total_score}.
+                The total score is ${
+                    record.total_score
+                } and te maximum score it could get is 100.
                 Here are the relevant sections: ${record.section_content.join(
                     ", "
                 )}.
@@ -253,7 +239,7 @@ const Recommender = ({ selectedYear }) => {
         const fetchRecordsAndFormulas = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
+                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
                 );
                 const recordsData = await response.json();
 
@@ -278,7 +264,7 @@ const Recommender = ({ selectedYear }) => {
                 const formulas = {};
                 for (const sectionId of uniqueSectionIds) {
                     const formulaResponse = await fetch(
-                        `http://localhost:9000/api/get/formula/${sectionId}`
+                        `https://ai-backend-drcx.onrender.com/api/get/formula/${sectionId}`
                     );
                     const formulaData = await formulaResponse.json();
                     if (formulaData.length > 0) {
@@ -342,10 +328,11 @@ const Recommender = ({ selectedYear }) => {
             try {
                 let url;
                 localStorage.getItem("role").toString() === "1"
-                    ? (url = `http://localhost:9000/api/get/campus-by-user-id/${localStorage.getItem(
+                    ? (url = `https://ai-backend-drcx.onrender.com/api/get/campus-by-user-id/${localStorage.getItem(
                           "user_id"
                       )}`)
-                    : (url = "http://localhost:9000/api/get/campuses");
+                    : (url =
+                          "https://ai-backend-drcx.onrender.com/api/get/campuses");
 
                 const response = await fetch(url);
                 const data = await response.json();

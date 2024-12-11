@@ -23,7 +23,7 @@ const UpdateUserModal = ({ userId, setIsUpdateModalOpen, setReload }) => {
         const getUserDetails = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/sd-office/${userId}`
+                    `https://ai-backend-drcx.onrender.com/api/sd-office/${userId}`
                 );
                 const data = await response.json(); // Convert to JSON
                 setFormData({
@@ -139,7 +139,7 @@ const UpdateUserModal = ({ userId, setIsUpdateModalOpen, setReload }) => {
 
             // Make API call to update SD Office user
             const response = await fetch(
-                `http://localhost:9000/api/update/sd-office/${userId}`,
+                `https://ai-backend-drcx.onrender.com/api/update/sd-office/${userId}`,
                 {
                     method: "PATCH",
                     headers: {

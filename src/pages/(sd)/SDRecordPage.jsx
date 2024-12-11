@@ -4,6 +4,7 @@ import RecordSubmissionForm from "../../components/RecordSubmissionForm";
 import UpdateRecordForm from "../../components/UpdateRecordForm";
 import { useNavigate } from "react-router-dom";
 import NotificationCSD from "../../components/NotificationCSD";
+import SubmissionForm from "./SubmissionForm";
 
 const SDRecordPage = () => {
     const [selectedYear, setSelectedYear] = useState(2024);
@@ -106,7 +107,7 @@ const SDRecordPage = () => {
             if (selectedYear && selectedSdg) {
                 try {
                     const response = await fetch(
-                        `http://localhost:9000/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${localStorage.getItem(
+                        `https://ai-backend-drcx.onrender.com/api/get/recordbysdoffice/${selectedYear}/${selectedSdg}/${localStorage.getItem(
                             "user_id"
                         )}`, // Make sure there are no extra spaces here
                         {
@@ -210,6 +211,10 @@ const SDRecordPage = () => {
                         </>
                     ) : (
                         <>
+                            {/* <RecordSubmissionForm
+                                selectedSdg={selectedSdg}
+                                selectedYear={selectedYear}
+                            /> */}
                             <RecordSubmissionForm
                                 selectedSdg={selectedSdg}
                                 selectedYear={selectedYear}

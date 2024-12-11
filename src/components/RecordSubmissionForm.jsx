@@ -65,7 +65,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
         const fetchCampusData = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/sd-office/${localStorage.getItem(
+                    `https://ai-backend-drcx.onrender.com/api/get/sd-office/${localStorage.getItem(
                         "user_id"
                     )}`
                 );
@@ -73,10 +73,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 if (response.ok) {
                     const data = await response.json();
                     setCampusID(data[0].campus_id); // Set the campus state with fetched campus IDs
-                    console.log(
-                        "Campus IDs fetched successfully: ",
-                        data[0].campus_id
-                    );
                 } else {
                     console.error("Failed to fetch campus data.");
                     setError("Failed to fetch campus data.");
@@ -114,11 +110,10 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
 
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
+                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (response.ok) {
                     const instrumentData = await response.json();
-                    console.log(instrumentData, "hahahaha int");
 
                     await fetchSectionsForInstruments(instrumentData);
                 } else {
@@ -134,13 +129,15 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 const updatedInstruments = await Promise.all(
                     instrumentData.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `http://localhost:9000/api/get/sectionsbyinstrument/${instrument.instrument_id}`
+                            `https://ai-backend-drcx.onrender.com/api/get/sectionsbyinstrument/${instrument.instrument_id}`
                         );
+
                         if (sectionsResponse.ok) {
                             const sections = await sectionsResponse.json();
+                            console.log("hhe", instrument.instrument_id);
+
                             const sectionsWithQuestions =
                                 await fetchQuestionsForSections(sections);
-                            console.log(sections, "hahahaha sec");
 
                             return {
                                 ...instrument,
@@ -151,7 +148,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                         }
                     })
                 );
-                console.log(updatedInstruments, "asdasdasd");
                 setInstruments(updatedInstruments);
             } catch (error) {
                 setError("An error occurred while fetching sections.");
@@ -165,11 +161,11 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                     sections.map(async (section) => {
                         try {
                             const questionsResponse = await fetch(
-                                `http://localhost:9000/api/get/questions/${section.section_id}`
+                                `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
                             );
 
                             const fetchFormulas = await fetch(
-                                `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
+                                `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
                             );
                             const formula = await fetchFormulas.json();
 
@@ -184,7 +180,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                             if (questionsResponse.ok) {
                                 const questions =
                                     await questionsResponse.json();
-                                console.log(questions, "hahahaha");
 
                                 return {
                                     ...section,
@@ -198,14 +193,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                         }
                     })
                 );
-                // const flattenedFormulas = fetchedFormulas.flat();
-                // console.log(flattenedFormulas, "hahahaha formss");
-
-                // console.log(fetchedFormulas, "hahahaha forms");
-                // setFormulas((prevFormulas) => [
-                //     ...prevFormulas,
-                //     fetchedFormulas.flat(),
-                // ]);
 
                 return sectionsWithQuestions;
             } catch (error) {
@@ -237,7 +224,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 });
             });
         });
-        console.log(answers, "hahahaha anw");
 
         return answers;
     };
@@ -246,6 +232,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
         if (instruments.length > 0) {
             setAnswers(generateAnswers(instruments));
         }
+        console.log(instruments);
     }, [instruments]);
 
     const handleInputChange = (e, question_id, sub_id, campus_id) => {
@@ -274,7 +261,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 }
                 return acc;
             }, []);
-            console.log(uniqueFormulas, "Asd");
         }
 
         if (answers && answers.length > 0) {
@@ -308,8 +294,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 return acc;
             }, []); // Initialize as an empty array
 
-            setSumByQuestionID(summedAnswers); // Update the state with the summed answers as an array of objects
-            console.log(summedAnswers, "marker"); // Optional: for debugging
+            setSumByQuestionID(summedAnswers);
         } else {
             console.log("No answers or empty array", "marker");
         }
@@ -334,8 +319,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 valueMap[item.sub_id] = item.value; // Create a map for fast lookup
             });
 
-            console.log(valueMap, "hahahaha vas");
-
             const valueMapBySection = sumByQuestionID.reduce((acc, item) => {
                 // If the section doesn't exist in the accumulator, create it
                 if (!acc[item.section_id]) {
@@ -348,18 +331,10 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 return acc;
             }, {});
 
-            console.log(valueMapBySection, "hahahaha vass");
+            console.log(valueMap, "hehehe");
 
             // Function to replace values in the formula
             const replaceFormulaValues = (formula, valueMap) => {
-                console.log(
-                    formula.replace(/([A-Z]\d+)/g, (match) => {
-                        return valueMap[match] !== undefined
-                            ? valueMap[match]
-                            : match;
-                    }),
-                    "replaces"
-                );
                 return formula.replace(/([A-Z]\d+)/g, (match) => {
                     return valueMap[match] !== undefined
                         ? valueMap[match]
@@ -367,22 +342,17 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                 });
             };
 
-            console.log(uniqueFormulas, "hahahaha forw");
-
             // Updated Formulas with failsafe evaluation
             const updatedFormulasV = uniqueFormulas.map((formulaObj) => {
                 const updatedFormula = replaceFormulaValues(
                     formulaObj.formula,
-                    valueMapBySection[formulaObj.section_id]
+                    valueMap // Use the global valueMap here
                 );
-                console.log(updatedFormula, valueMap, "Updated Formula");
 
                 let result;
                 try {
                     // Attempt to evaluate the formula
                     const jsFormula = excelFormula.toJavaScript(updatedFormula);
-                    console.log(jsFormula, "JavaScript Formula");
-                    console.log(eval(jsFormula), "JavaScript Formula");
 
                     result = eval(jsFormula);
                 } catch (error) {
@@ -397,8 +367,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                     score: result, // Fallback to 0 if there's an error
                 };
             });
-
-            console.log(updatedFormulasV, "Final Formulas with Results");
 
             setUpdatedFormulas(updatedFormulasV); // Log the updated formulas with replaced values
         }
@@ -431,14 +399,9 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                     };
                     formData.append("sectionData", JSON.stringify(sectionData));
 
-                    // Log each key-value pair in FormData for debugging
-                    for (let [key, value] of formData.entries()) {
-                        console.log(key, value);
-                    }
-
                     // Send the individual file request
                     const response = await fetch(
-                        `http://localhost:9000/api/upload-evidence/${recordId}`,
+                        `https://ai-backend-drcx.onrender.com/api/upload-evidence/${recordId}`,
                         {
                             method: "POST",
                             body: formData,
@@ -448,7 +411,6 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
                     if (!response.ok) throw new Error("Failed to upload file");
 
                     const result = await response.json();
-                    console.log("File uploaded successfully:", result);
                 }
             }
 
@@ -460,7 +422,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
     };
 
     const sendAnswers = async (recordId) => {
-        const url = "http://localhost:9000/api/add/answers";
+        const url = "https://ai-backend-drcx.onrender.com/api/add/answers";
         for (const answer of answers) {
             if (!answer.question_id || !answer.campus_id) {
                 console.error("Invalid answer data:", answer);
@@ -519,7 +481,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
         try {
             // Submit the record to the server
             const recordResponse = await fetch(
-                "http://localhost:9000/api/add/records",
+                "https://ai-backend-drcx.onrender.com/api/add/records",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -578,7 +540,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
 
                     // Send a request to insert the notification
                     const notifResponse = await fetch(
-                        "http://localhost:9000/api/create-notification",
+                        "https://ai-backend-drcx.onrender.com/api/create-notification",
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -591,10 +553,7 @@ const RecordSubmissionForm = ({ selectedSdg, selectedYear }) => {
 
                     if (!notifResponse.ok)
                         throw new Error("Failed to create notification");
-
-                    console.log("Notification sent successfully");
                 }
-                console.log("All answers submitted successfully.");
 
                 Swal.fire({
                     title: "Success!",

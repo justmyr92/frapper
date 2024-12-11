@@ -107,7 +107,7 @@ const FileRanking = () => {
         const getSdgData = async () => {
             try {
                 const sdgResponse = await fetch(
-                    "http://localhost:9000/api/get/records-count-per-sdg"
+                    "https://ai-backend-drcx.onrender.com/api/get/records-count-per-sdg"
                 );
                 const sdgList = await sdgResponse.json();
                 console.log(sdgList);
@@ -120,7 +120,7 @@ const FileRanking = () => {
         const getFileCount = async () => {
             try {
                 const fileCountResponse = await fetch(
-                    "http://localhost:9000/api/get/records-count-by-status"
+                    "https://ai-backend-drcx.onrender.com/api/get/records-count-by-status"
                 );
                 const fileCountData = await fileCountResponse.json();
                 setFileCount(fileCountData);
@@ -138,7 +138,7 @@ const FileRanking = () => {
             if (selectedSDG) {
                 try {
                     const setRecordsResponse = await fetch(
-                        `http://localhost:9000/api/get/records-pero-question/${selectedSDG}`,
+                        `https://ai-backend-drcx.onrender.com/api/get/records-pero-question/${selectedSDG}`,
                         {
                             method: "GET",
                             headers: {

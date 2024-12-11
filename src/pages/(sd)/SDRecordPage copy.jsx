@@ -49,7 +49,7 @@ const SDRecordPage = () => {
         const getSDOfficers = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9000/api/get/sd-office"
+                    "https://ai-backend-drcx.onrender.com/api/get/sd-office"
                 );
                 const jsonData = await response.json();
                 setSdOfficers(jsonData);
@@ -148,7 +148,7 @@ const SDRecordPage = () => {
         const fetchInstrumentsBySdg = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:9000/api/get/instrumentsbysdg/${selectedSdg}`
+                    `https://ai-backend-drcx.onrender.com/api/get/instrumentsbysdg/${selectedSdg}`
                 );
                 if (!response.ok) {
                     throw new Error(
@@ -162,7 +162,7 @@ const SDRecordPage = () => {
                 const instrumentsWithDetails = await Promise.all(
                     data.map(async (instrument) => {
                         const sectionsResponse = await fetch(
-                            `http://localhost:9000/api/get/sections/${instrument.instrument_id}`
+                            `https://ai-backend-drcx.onrender.com/api/get/sections/${instrument.instrument_id}`
                         );
                         if (!sectionsResponse.ok) {
                             throw new Error(
@@ -175,11 +175,11 @@ const SDRecordPage = () => {
                         const sectionsWithQuestions = await Promise.all(
                             sections.map(async (section) => {
                                 const questionsResponse = await fetch(
-                                    `http://localhost:9000/api/get/questions/${section.section_id}`
+                                    `https://ai-backend-drcx.onrender.com/api/get/questions/${section.section_id}`
                                 );
 
                                 const formulaResponse = await fetch(
-                                    `http://localhost:9000/api/get/formula_per_section/${section.section_id}`
+                                    `https://ai-backend-drcx.onrender.com/api/get/formula_per_section/${section.section_id}`
                                 );
                                 if (!questionsResponse.ok) {
                                     throw new Error(
@@ -346,20 +346,24 @@ const SDRecordPage = () => {
             date_submitted: new Date().toISOString(),
         };
 
-        const response = await fetch("http://localhost:9000/api/add/records", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(recordData),
-        });
+        const response = await fetch(
+            "https://ai-backend-drcx.onrender.com/api/add/records",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(recordData),
+            }
+        );
 
         if (response.ok) {
             const record = await response.json();
 
             const sendAnswers = async (answers) => {
                 // URL of your Express endpoint
-                const url = "http://localhost:9000/api/add/answers";
+                const url =
+                    "https://ai-backend-drcx.onrender.com/api/add/answers";
 
                 // Loop through each answer object in the array
                 for (const answer of answers) {

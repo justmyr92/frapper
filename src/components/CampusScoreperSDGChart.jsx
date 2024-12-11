@@ -15,10 +15,11 @@ const processFormulas = (records) => {
         // });
 
         const subIdValueMap = {};
-        console.log(data, "Asd");
         data.forEach((item) => {
             subIdValueMap[item.sub_id] = item.value;
         });
+
+        console.log(data, subIdValueMap, "ASD");
 
         return formula.replace(/([A-Z]\d+)/g, (match) => {
             return subIdValueMap[match] || 0;
@@ -43,6 +44,8 @@ const processFormulas = (records) => {
                     formulaItem.formula,
                     sdgRecord.data
                 );
+                console.log(updatedFormula, "asdd");
+
                 // Add the updated formula to the list and mark section_id as seen
                 let score = eval(excelFormula.toJavaScript(updatedFormula));
                 total_score = total_score + score;
@@ -160,7 +163,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
             try {
                 // Fetch the records for the selected campus
                 const response = await fetch(
-                    `http://localhost:9000/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
+                    `https://ai-backend-drcx.onrender.com/api/get/records-values-by-campus_id/${selectedCampus}/${selectedYear}`
                 );
                 const recordsData = await response.json();
 
@@ -180,7 +183,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
                 const formulas = {};
                 for (const sectionId of uniqueSectionIds) {
                     const formulaResponse = await fetch(
-                        `http://localhost:9000/api/get/formula/${sectionId}`
+                        `https://ai-backend-drcx.onrender.com/api/get/formula/${sectionId}`
                     );
                     const formulaData = await formulaResponse.json();
                     if (formulaData.length > 0) {
@@ -242,7 +245,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
         const fetchCampuses = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9000/api/get/campuses"
+                    "https://ai-backend-drcx.onrender.com/api/get/campuses"
                 );
                 const data = await response.json();
                 setCampuses(data);
@@ -267,7 +270,7 @@ const CampusScoreperSDGChart = ({ selectedYear }) => {
     return (
         <Card className="w-[100%]">
             <h3 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                Score per Campus
+                SDG Scores Per campus
             </h3>
             <div className="grid grid-cols-5 gap-2 mt-4">
                 {campuses.map((campus, index) => (

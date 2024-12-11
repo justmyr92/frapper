@@ -552,7 +552,7 @@ const AddInstrumentPage = () => {
             for (const subtitle of instrumentData.subtitles) {
                 // Submit the subtitle
                 const subtitleResponse = await fetch(
-                    "http://localhost:9000/api/add/instruments",
+                    "https://ai-backend-drcx.onrender.com/api/add/instruments",
                     {
                         method: "POST",
                         headers: {
@@ -574,7 +574,7 @@ const AddInstrumentPage = () => {
                 for (const section of subtitle.sections) {
                     // Submit the section
                     const sectionResponse = await fetch(
-                        "http://localhost:9000/api/add/sections",
+                        "https://ai-backend-drcx.onrender.com/api/add/sections",
                         {
                             method: "POST",
                             headers: {
@@ -582,7 +582,7 @@ const AddInstrumentPage = () => {
                             },
                             body: JSON.stringify({
                                 section_content: section.content,
-                                subtitle_id: subtitleData.subtitle_id,
+                                instrument_id: subtitleData.instrument_id,
                             }),
                         }
                     );
@@ -596,7 +596,7 @@ const AddInstrumentPage = () => {
                     for (const question of section.questions) {
                         // Submit the question
                         const questionResponse = await fetch(
-                            "http://localhost:9000/api/add/questions",
+                            "https://ai-backend-drcx.onrender.com/api/add/questions",
                             {
                                 method: "POST",
                                 headers: {
@@ -622,7 +622,7 @@ const AddInstrumentPage = () => {
                         if (question.questionType === "Multiple Options") {
                             for (const option of question.options) {
                                 const optionResponse = await fetch(
-                                    "http://localhost:9000/api/add/options",
+                                    "https://ai-backend-drcx.onrender.com/api/add/options",
                                     {
                                         method: "POST",
                                         headers: {
@@ -648,7 +648,7 @@ const AddInstrumentPage = () => {
                     // Submit formulas for the section
                     for (const formula of section.formulas) {
                         const formulaResponse = await fetch(
-                            "http://localhost:9000/api/add/formulas",
+                            "https://ai-backend-drcx.onrender.com/api/add/formulas",
                             {
                                 method: "POST",
                                 headers: {
